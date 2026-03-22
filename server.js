@@ -4,7 +4,6 @@ const cookieParser = require("cookie-parser");
 require("dotenv").config();
 const mongoose = require("mongoose");
 const router = require("./routes");
-
 const app = express();
 
 app.use(
@@ -18,7 +17,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/", router);
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to Database"))
