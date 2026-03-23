@@ -1,4 +1,5 @@
 const express = require("express");
+const authorization = require("../../middleware/authorization");
 const router = express.Router();
 const {
   createPublisher,
@@ -8,10 +9,10 @@ const {
   updatePublisher,
 } = require("../../controllers/publisherController");
 
-router.post("/createPublisher", createPublisher);
+router.post("/createPublisher", authorization(["admin", "moderator"]), createPublisher);
 router.get("/getAllPublishers", getAllPublishers);
 router.get("/getPublisherById/:id", getPublisherById);
-router.delete("/deletePublisher/:id", deletePublisher);
-router.post("/updatePublisher/:id", updatePublisher);
+router.delete("/deletePublisher/:id", authorization(["admin", "moderator"]), deletePublisher);
+router.post("/updatePublisher/:id", authorization(["admin", "moderator"]), updatePublisher);
 
 module.exports = router;
