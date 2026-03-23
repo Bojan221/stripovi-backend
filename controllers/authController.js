@@ -38,6 +38,7 @@ const registerUser = async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
+      profilePicture: null,
     });
     return res.status(201).json({ message: "Registracija uspjesna!" });
   } catch (err) {
@@ -95,6 +96,9 @@ const loginUser = async (req, res) => {
           lastName: user.lastName,
           email: user.email,
           role: user.role,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+          profilePicture: user.profilePicture,
         },
       });
   } catch (err) {

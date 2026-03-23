@@ -16,6 +16,7 @@ const getUserById = async (req, res) => {
     const currentUser = req.user;
 
     const user = await User.findById(id).select("-password");
+ 
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -43,6 +44,10 @@ const deleteUser = async (req, res) => {
     const { id } = req.params;
     const currentUser = req.user;
 
+    if(id === currentUser.id){
+      return res.status(400).json({message:"Ne možete obrisati svoj nalog!"})
+    }
+
     const deletedUser = await User.findByIdAndDelete(id);
     if (!deletedUser) {
       return res.status(404).json({ message: "Korisnik nije pronađen." });
@@ -53,4 +58,37 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, getUserById, updateUser, deleteUser };
+const changeProfilePicture = async (req, res) => {
+  try { 
+    console.log(req.file)
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+const updateUserEmail = async (req, res) => {
+  try {
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+const updateUserPassword = async (req, res) => {
+  try {
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+const updateUserNames = async (req, res) => {
+  try {
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+} 
+
+module.exports = { getAllUsers, getUserById, updateUser, deleteUser, changeProfilePicture, updateUserEmail, updateUserPassword, updateUserNames };
