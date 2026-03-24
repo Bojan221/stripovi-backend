@@ -1,4 +1,6 @@
 const User = require("../models/User");
+const path = require("path")
+const fs = require("fs")
 const getAllUsers = async (req, res) => {
   try {
     const user = req.user;
@@ -60,7 +62,30 @@ const deleteUser = async (req, res) => {
 
 const changeProfilePicture = async (req, res) => {
   try { 
-    console.log(req.file)
+    if(!req.file) { 
+      return res.status(400).json({ message: "Nije odabrana slika!" });
+    }
+
+    const newFilePath = path.join("uploads","users", req.file.filename);
+
+    const user = await User.findById(req.user.id)
+
+    if(user.profilePicture) { 
+      const oldImagePath = path.join(__dirname, "..", user.profilePicture);
+      
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);
+      }
+    }
+
+    user.profilePicture = newFilePath;
+    await user.save();
+    
+    res.status(200).json({ 
+      message: "Profilna slika je uspješno promijenjena!",
+      profilePicture: newFilePath,
+      user: user
+    });
 
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -85,7 +110,18 @@ const updateUserPassword = async (req, res) => {
 
 const updateUserNames = async (req, res) => {
   try {
+    const { firstName, lastName } = req.body;
 
+    if(!firstName.trim() || !lastName.trim()) {
+      return res.status(400).json({ message: "Ime i prezime ne smiju biti prazni!" });
+    }
+
+    const user = await User.findByIdAndUpdate(req.user.id,{
+      firstName,
+      lastName
+    }, { returnDocument: 'after', runValidators: true }).select("-password");
+    
+    res.status(200).json({ message: "Ime i prezime su uspješno ažurirani!", user });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
