@@ -32,7 +32,7 @@ const getAllPublishers = async (req, res) => {
   try {
     const publishers = await Publisher.find()
       .select("-__v")
-      .populate("createdBy", "firstName lastName email role");
+      .populate("createdBy", "firstName lastName email role profilePicture");
     if (publishers) {
       return res.status(200).json(publishers);
     } else {

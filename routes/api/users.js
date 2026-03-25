@@ -14,7 +14,7 @@ router.get("/getAllUsers", authorization(["admin", "moderator"]), getAllUsers);
 router.get("/getUserById/:id", authorization(["admin", "moderator"]), getUserById);
 router.post("/updateUser/:id", authorization(["admin", "moderator"]), updateUser);
 router.delete("/deleteUser/:id", authorization(["admin", "moderator"]), deleteUser);
-router.put("/changeProfilePicture", createUpload("users").single("profilePicture"), changeProfilePicture);
+router.put("/changeProfilePicture", authorization(["user", "admin", "moderator"]), createUpload("users").single("profilePicture"), changeProfilePicture);
 router.put("/updateUserEmail", updateUserEmail);
 router.put("/updateUserPassword", updateUserPassword);
 router.put("/updateUserNames",updateUserNames);  

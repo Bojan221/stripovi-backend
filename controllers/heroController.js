@@ -1,8 +1,6 @@
 const Hero = require("../models/Hero");
 const createHero = async (req, res) => {
   try {
-    console.log(req.user);
-    console.log(req.body);
     const{name,alias}= req.body
     if(!name || !alias){
       return res.status(400).json({message:"Ime junaka i alias su obavezni"})
@@ -31,17 +29,37 @@ const createHero = async (req, res) => {
 
 const getAllHeroes = async (req, res) => {
   try {
-  } catch (err) {}
+    const heroes = await Hero.find().populate("createdBy", "firstName lastName email role profilePicture");
+    res.status(200).json({ heroes });
+  } catch (err) {
+    res.status(500).json({ message: "Došlo je do greške prilikom dohvaćanja junaka" });
+  }
 };
 
 const getHeroById = async (req, res) => {
   try {
-  } catch (err) {}
+    const { id } = req.params;
+    const hero = await Hero.findById(id).populate("createdBy", "firstName lastName email role profilePicture");
+    if (!hero) {
+      return res.status(404).json({ message: "Junak nije pronađen" });
+    }
+    res.status(200).json({ hero });
+  } catch (err) {
+    res.status(500).json({ message: "Došlo je do greške prilikom dohvaćanja junaka" });
+  }
 };
 
 const deleteHero = async (req, res) => {
   try {
-  } catch (err) {}
+      const { id } = req.params;
+      const deletedHero = await Hero.findByIdAndDelete(id);
+      if (!deletedHero) {
+        return res.status(404).json({ message: "Junak nije pronađen" });
+      }
+      res.status(200).json({ message: "Junak je uspješno obrisan" });
+  } catch (err) {
+    res.status(500).json({ message: "Došlo je do greške prilikom brisanja junaka" });
+  }
 };
 
 const updateHero = async (req, res) => {
