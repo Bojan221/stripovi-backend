@@ -2,10 +2,6 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 
-/**
- * @param {string} folderPath -
- * @returns multer instance
- */
 const createUpload = (folderPath) => {
   const fullPath = path.join(__dirname, "..", "uploads", folderPath);
 
