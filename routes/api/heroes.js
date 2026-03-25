@@ -12,7 +12,15 @@ const {
 router.get("/getAllHeroes", getAllHeroes);
 router.get("/getHeroById/:id", getHeroById);
 router.post("/createHero", authorization(["admin", "moderator"]), createHero);
-router.post("/updateHero/:id", authorization(["admin", "moderator"]), updateHero);
-router.delete("/deleteHero/:id", authorization(["admin", "moderator"]), deleteHero);
+router.put(
+  "/updateHero/:id",
+  authorization(["admin", "moderator"]),
+  updateHero,
+);
+router.delete(
+  "/deleteHero/:id",
+  authorization(["admin", "moderator"]),
+  deleteHero,
+);
 
 module.exports = router;
