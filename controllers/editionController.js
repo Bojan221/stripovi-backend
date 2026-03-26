@@ -28,6 +28,7 @@ const createEdition = async (req, res) => {
 
 const getAllEditions = async (req, res) => {
   try {
+    console.log(req.query);
     const editions = await Edition.find()
       .select("-__v")
       .populate("createdBy", "firstName lastName email profilePicture")
