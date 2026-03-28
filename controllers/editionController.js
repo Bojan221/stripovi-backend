@@ -28,15 +28,28 @@ const createEdition = async (req, res) => {
 
 const getAllEditions = async (req, res) => {
   try {
-    console.log(req.query);
-    const editions = await Edition.find()
+    const { page, limit, publisher, hero } = req.query;
+
+    let currentPage = parseInt(page) || 1;
+    const filter = {};
+    if (publisher) filter.publisher = publisher;
+    if (hero) filter.heroes = hero;
+
+    const total = await Edition.countDocuments(filter);
+    const totalPages = Math.ceil(total / 10);
+    const editions = await Edition.find(filter)
       .select("-__v")
       .populate("createdBy", "firstName lastName email profilePicture")
       .populate("publisher", "name country")
-      .populate("heroes", "name alias");
+      .populate("heroes", "name alias")
+      .limit(10)
+      .skip((currentPage - 1) * 10)
+      .exec();
 
     if (editions) {
-      return res.status(200).json({ editions });
+      return res
+        .status(200)
+        .json({ editions, totalEditions: total, totalPages });
     } else {
       return res.status(500).json({ message: "Došlo je do greške" });
     }
