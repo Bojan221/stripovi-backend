@@ -57,7 +57,45 @@ const getAllEditions = async (req, res) => {
     res.status(500).json({ message: "Došlo je do greške" });
   }
 };
+
+const updateEdition = async(req,res) => { 
+  try {
+    
+    const {id} = req.params;
+    const {name,publisher,heroes} = req.body;
+
+    const updatedEdition = await Edition.findByIdAndUpdate(
+      id,
+      {name,publisher, heroes},
+      { returnDocument: "after", runValidators: true }
+    );
+
+    if(updatedEdition) { 
+      res.status(200).json({message:"Edicija je uspješno promijenjena"})
+    } else { 
+      res.status(500).json({message:"Došlo je do greške"})
+    }
+  }catch{
+    res.status(500).json({message: "Došlo je do greške"})
+  }
+}
+
+const deleteEdition = async(req,res) => { 
+  try {
+    const {id} = req.params;
+    const deleted = await Edition.findByIdAndDelete(id);
+    if(deleted) { 
+      res.status(200).json({message:"Edicija je uspješno obrisana"})
+    } else {
+    res.status(500).json({message: "Došlo je do greške"})
+  }
+  } catch{
+    res.status(500).json({message: "Došlo je do greške na serveru"})
+  }
+}
 module.exports = {
   createEdition,
   getAllEditions,
+  updateEdition,
+  deleteEdition
 };
