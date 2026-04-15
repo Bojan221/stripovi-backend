@@ -155,4 +155,20 @@ const refreshAuth = (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, refreshAuth };
+const forgotPassword = async (req,res) => { 
+  try { 
+     const {email} = req.body;
+
+     const existingUser = await User.findOne({email});
+
+     if(!existingUser) { 
+      return res.status(400).json({message:"Korisnik sa ovim emailom ne postoji!"})
+     }
+
+     res.status(200).json({message:"User postoji"})
+  }catch{
+    res.status(500).json({message:"Greska na serveru"})
+  }
+}
+
+module.exports = { registerUser, loginUser, refreshAuth, forgotPassword };
