@@ -22,6 +22,7 @@ router.post(
 router.put(
   "/updateComic/:id",
   authorization(["admin", "moderator"]),
+  upload.single("cover"),
   updateComic,
 );
 router.delete(

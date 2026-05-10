@@ -66,15 +66,35 @@ const createComic = async (req, res) => {
 
 const updateComic = async (req, res) => {
   try {
+    const { id } = req.params;
+    const { title, issueNumber, heroId, editionId } = req.body;
+
+    const updates = { title, issueNumber, hero: heroId, edition: editionId };
+    if (req.file) updates.coverImage = req.file.filename;
+
+    const updated = await Comic.findByIdAndUpdate(id, updates, { new: true });
+
+    if (!updated) {
+      return res.status(404).json({ message: "Strip nije pronađen!" });
+    }
+
+    res.status(200).json({ message: "Strip je uspješno ažuriran!", data: updated });
   } catch (err) {
-    res.status(500).json({ message: err });
+    res.status(500).json({ message: err.message });
   }
 };
 
 const deleteComic = async (req, res) => {
   try {
-  } catch (err) {
-    res.status(500).json({ message: err });
+    const { id } = req.params;
+    const deleted = await Comic.findByIdAndDelete(id);
+    if (deleted) {
+      res.status(200).json({ message: "Strip je uspješno obrisan" });
+    } else {
+      res.status(500).json({ message: "Došlo je do greške" });
+    }
+  } catch {
+    res.status(500).json({ message: "Došlo je do greške na serveru" });
   }
 };
 
