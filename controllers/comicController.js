@@ -1,14 +1,41 @@
 const Comic = require("../models/Comic");
+const mongoose = require("mongoose");
 
 const getAllComics = async (req, res) => {
   try {
-    const { page, limit, hero, edition } = req.query;
+    const { page, limit, hero, edition, publisher, search } = req.query;
+
     let currentPage = parseInt(page) || 1;
+    let perPage = parseInt(limit) || 12;
+
     const filter = {};
-    //  if (hero) filter.heroes = hero;
-    if (edition) filter.edition = edition;
+
+    if (hero && mongoose.Types.ObjectId.isValid(hero)) {
+      filter.hero = hero;
+    }
+
+    if (edition && mongoose.Types.ObjectId.isValid(edition)) {
+      filter.edition = edition;
+    }
+
+    if (search) {
+      filter.title = { $regex: search, $options: "i" };
+    }
+
+    if (publisher && mongoose.Types.ObjectId.isValid(publisher)) {
+      const editions = await mongoose
+        .model("Edition")
+        .find({ publisher })
+        .select("_id");
+
+      const editionIds = editions.map((e) => e._id);
+
+      filter.edition = { $in: editionIds.length ? editionIds : [null] };
+    }
+
     const total = await Comic.countDocuments(filter);
-    const totalPages = Math.ceil(total / 10);
+    const totalPages = Math.ceil(total / perPage);
+
     const comics = await Comic.find(filter)
       .select("-__v")
       .populate("createdBy", "firstName lastName email profilePicture")
@@ -18,20 +45,21 @@ const getAllComics = async (req, res) => {
         populate: { path: "publisher", select: "name" },
       })
       .populate("hero", "name alias")
-      .limit(10)
-      .skip((currentPage - 1) * 10)
+      .limit(perPage)
+      .skip((currentPage - 1) * perPage)
+      .sort({ issueNumber: 1 })
       .exec();
 
-    if (comics) {
-      return res.status(200).json({ comics, totalComics: total, totalPages });
-    } else {
-      return res.status(500).json({ message: "Došlo je do greške" });
-    }
+    return res.status(200).json({
+      comics,
+      totalComics: total,
+      totalPages,
+      currentPage,
+    });
   } catch (err) {
-    res.status(500).json({ message: err });
+    return res.status(500).json({ message: err.message });
   }
 };
-
 const getComicById = async (req, res) => {
   try {
   } catch (err) {
@@ -78,7 +106,9 @@ const updateComic = async (req, res) => {
       return res.status(404).json({ message: "Strip nije pronađen!" });
     }
 
-    res.status(200).json({ message: "Strip je uspješno ažuriran!", data: updated });
+    res
+      .status(200)
+      .json({ message: "Strip je uspješno ažuriran!", data: updated });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
