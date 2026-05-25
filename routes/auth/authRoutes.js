@@ -4,13 +4,15 @@ const {
   registerUser,
   loginUser,
   refreshAuth,
-  forgotPassword
+  forgotPassword,
+  resetPassword,
 } = require("../../controllers/authController");
 
 router.post("/registerUser", registerUser);
 router.post("/loginUser", loginUser);
 router.get("/refreshAuth", refreshAuth);
 router.post("/forgotPassword", forgotPassword)
+router.post("/resetPassword/:token", resetPassword)
 router.post("/logoutUser", (req, res) => {
   res.clearCookie("refreshToken", {
     httpOnly: true,
