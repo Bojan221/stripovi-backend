@@ -1,6 +1,4 @@
 const User = require("../models/User");
-const path = require("path");
-const fs = require("fs");
 const bcrypt = require("bcrypt");
 const getAllUsers = async (req, res) => {
   try {
@@ -68,33 +66,17 @@ const changeProfilePicture = async (req, res) => {
       return res.status(400).json({ message: "Nije odabrana slika!" });
     }
 
-    const newFilePath = path.join("uploads", "users", req.file.filename);
+    const driveUrl = req.file.driveUrl;
 
     const user = await User.findById(req.user.id);
-
-    if (user.profilePicture) {
-      const oldImagePath = path.join(__dirname, "..", user.profilePicture);
-
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlinkSync(oldImagePath);
-      }
-    }
-
-    user.profilePicture = newFilePath;
+    user.profilePicture = driveUrl;
     await user.save();
 
     res.status(200).json({
       message: "Profilna slika je uspješno promijenjena!",
-      profilePicture: newFilePath,
+      profilePicture: driveUrl,
       user: user,
     });
-
-    const updateUser = await User.findByIdAndUpdate(
-      userId,
-      { profilePicture: filePath },
-      { new: true },
-    );
-    console.log(updateUser);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

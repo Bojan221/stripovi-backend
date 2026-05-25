@@ -80,7 +80,7 @@ const createComic = async (req, res) => {
       issueNumber,
       hero: heroId,
       edition: editionId,
-      coverImage: req.file.filename,
+      coverImage: req.file.driveUrl,
       createdBy: req.user.id,
     });
 
@@ -98,7 +98,7 @@ const updateComic = async (req, res) => {
     const { title, issueNumber, heroId, editionId } = req.body;
 
     const updates = { title, issueNumber, hero: heroId, edition: editionId };
-    if (req.file) updates.coverImage = req.file.filename;
+    if (req.file) updates.coverImage = req.file.driveUrl;
 
     const updated = await Comic.findByIdAndUpdate(id, updates, { new: true });
 
