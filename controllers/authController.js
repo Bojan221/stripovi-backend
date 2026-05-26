@@ -143,6 +143,7 @@ const refreshAuth = (req, res) => {
             lastName: user.lastName,
             email: user.email,
             role: user.role,
+          profilePicture: user.profilePicture,
           },
           process.env.JWT_ACCESS_SECRET,
           { expiresIn: "15m" },
@@ -156,6 +157,7 @@ const refreshAuth = (req, res) => {
             lastName: user.lastName,
             email: user.email,
             role: user.role,
+          profilePicture: user.profilePicture,
           },
         });
       },
