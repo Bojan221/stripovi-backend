@@ -1,4 +1,5 @@
 const Comic = require("../models/Comic");
+const UserComic = require("../models/UserComic");
 const mongoose = require("mongoose");
 
 const getAllComics = async (req, res) => {
@@ -50,8 +51,23 @@ const getAllComics = async (req, res) => {
       .sort({ issueNumber: 1 })
       .exec();
 
+    let ownedComicIds = new Set();
+    if (req.user?.id) {
+      const comicIds = comics.map((c) => c._id);
+      const userComics = await UserComic.find({
+        user: req.user.id,
+        comic: { $in: comicIds },
+      }).select("comic");
+      ownedComicIds = new Set(userComics.map((uc) => uc.comic.toString()));
+    }
+
+    const comicsWithOwnership = comics.map((comic) => ({
+      ...comic.toObject(),
+      isOwned: ownedComicIds.has(comic._id.toString()),
+    }));
+
     return res.status(200).json({
-      comics,
+      comics: comicsWithOwnership,
       totalComics: total,
       totalPages,
       currentPage,
