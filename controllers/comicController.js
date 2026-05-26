@@ -65,7 +65,7 @@ const getAllComics = async (req, res) => {
       ...comic.toObject(),
       isOwned: ownedComicIds.has(comic._id.toString()),
     }));
-
+    
     return res.status(200).json({
       comics: comicsWithOwnership,
       totalComics: total,
