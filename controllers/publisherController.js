@@ -66,7 +66,6 @@ const getPublisherById = async (req, res) => {
 const deletePublisher = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id);
     const publisher = await Publisher.findByIdAndDelete(id);
 
     if (publisher) {

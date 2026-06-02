@@ -1,40 +1,33 @@
-const UserComic = require("../models/UserComic");
+const FavoriteComic = require("../models/FavoriteComic")
 const mongoose = require("mongoose");
 
-const addToCollection = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const comicId = req.body.comic;
-    const condition = req.body.condition
+const addToFavorites = async(req,res) => { 
+    try {
+        const userId = req.user.id;
+        const comicId = req.body.comic;
 
-    const existingComic = await UserComic.findOne({
-      user: userId,
-      comic: comicId,
-    });
+        const existingComic = await FavoriteComic.findOne({user: userId, comic: comicId})
 
-    if (existingComic) {
-      return res
-        .status(409)
-        .json({ message: "Strip vec postoji u kolekciji!" });
+        if(existingComic) { 
+            return res.status(409).json({message: "Strip vec postoji u omiljenim!"})
+        }
+        const favoriteComic = await FavoriteComic.create({
+            user: userId, 
+            comic: comicId
+        }) 
+        
+        if(favoriteComic) { 
+            return res.status(200).json({message: "Strip je uspjesno dodan!"})
+        } else  { 
+            return res.status(500).json({messasge:"Greska pri dodavanju stripa!"})
+        }
+        
+    }catch {
+        res.status(500).json({message:"Doslo je do greske na serveru!"})
     }
+}
 
-    const userComic = await UserComic.create({
-      user: userId,
-      comic: comicId,
-      condition
-    });
-
-    if (userComic) {
-      return res.status(200).json({ message: "Strip je uspjesno dodan!" });
-    } else {
-      return res.status(500).json({ messasge: "Greska pri dodavanju stripa!" });
-    }
-  } catch (err) {
-    res.status(500).json({ message: "Greska na serveru!" });
-  }
-};
-
-const getUserComics = async (req, res) => {
+const getFavoriteComic = async (req, res) => {
   try {
     const userId = req.user.id;
     const { page, limit, hero, edition, publisher, search } = req.query;
@@ -66,9 +59,7 @@ const getUserComics = async (req, res) => {
     }
 
     const matchingComicIds = Object.keys(comicFilter).length
-      ? (await mongoose.model("Comic").find(comicFilter).select("_id")).map(
-          (c) => c._id,
-        )
+      ? (await mongoose.model("Comic").find(comicFilter).select("_id")).map((c) => c._id)
       : null;
 
     const userComicFilter = { user: userId };
@@ -76,18 +67,15 @@ const getUserComics = async (req, res) => {
       userComicFilter.comic = { $in: matchingComicIds };
     }
 
-    const total = await UserComic.countDocuments(userComicFilter);
+    const total = await FavoriteComic.countDocuments(userComicFilter);
     const totalPages = Math.ceil(total / perPage);
 
-    const userComics = await UserComic.find(userComicFilter)
+    const favoriteComics = await FavoriteComic.find(userComicFilter)
       .populate({
         path: "comic",
         select: "-__v",
         populate: [
-          {
-            path: "createdBy",
-            select: "firstName lastName email profilePicture",
-          },
+          { path: "createdBy", select: "firstName lastName email profilePicture" },
           {
             path: "edition",
             select: "name publisher",
@@ -102,7 +90,7 @@ const getUserComics = async (req, res) => {
       .exec();
 
     return res.status(200).json({
-      comics: userComics,
+      comics: favoriteComics,
       totalComics: total,
       totalPages,
       currentPage,
@@ -116,8 +104,8 @@ const deleteComic = async (req, res) => {
   try {
     const user = req.user.id;
     const comic = req.body.comic;
-    
-    const deletedComic = await UserComic.findOneAndDelete({ user: user, comic: comic });
+
+    const deletedComic = await FavoriteComic.findOneAndDelete({ user: user, comic: comic });
     if(deletedComic) { 
       res.status(200).json({message: "Strip uspjesno obrisan iz kolekcije."})
     }
@@ -125,9 +113,8 @@ const deleteComic = async (req, res) => {
     res.status(500).json({ message: "Greska na serveru!" });
   }
 };
-
 module.exports = {
-  addToCollection,
-  getUserComics,
-  deleteComic
-};
+    addToFavorites,
+    getFavoriteComic,
+    deleteComic
+}

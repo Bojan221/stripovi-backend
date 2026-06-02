@@ -7,4 +7,5 @@ router.use("/heroes", require("./heroes"));
 router.use("/editions", require("./editions"));
 router.use("/comics", require("./comics"));
 router.use("/userComics", require("./userComics"));
+router.use("/favoriteComics", require("./favoriteComics"));
 module.exports = router;
