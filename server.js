@@ -7,9 +7,17 @@ const router = require("./routes");
 const app = express();
 const path = require("path");
 
-app.use(cors({
-  origin: "*"
-}));
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://stripovi.vercel.app"
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true
+  })
+);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(express.json());
