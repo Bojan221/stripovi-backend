@@ -8,7 +8,7 @@ const app = express();
 const path = require("path");
 
 const allowedOrigins = [
-  "http://localhost:5173",
+  "http://localhost:3001",
   "https://stripovi.vercel.app"
 ];
 
