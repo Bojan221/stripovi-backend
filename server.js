@@ -7,12 +7,9 @@ const router = require("./routes");
 const app = express();
 const path = require("path");
 
-app.use(
-  cors({
-    origin: "http://localhost:3001",
-    credentials: true,
-  }),
-);
+app.use(cors({
+  origin: "*"
+}));
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(express.json());
